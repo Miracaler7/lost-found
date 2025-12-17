@@ -10,7 +10,6 @@
     .page-title {
       font-size: 26px;
       font-weight: 700;
-      color: #1B1F3B;
       margin-left: 25px;
       margin-top: 25px;
     }
@@ -28,6 +27,7 @@
     .item-card {
       width: 300px;
       padding: 18px;
+      cursor: pointer;
     }
 
     .item-img {
@@ -35,6 +35,24 @@
       height: 180px;
       object-fit: cover;
       border-radius: 12px;
+    }
+
+    .popup-box input,
+    .popup-box textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .popup-box button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -44,7 +62,10 @@
   <!-- NAVBAR -->
   <div class="navbar">
     <div>Lost & Found — BMSCE</div>
-    <button class="nav-btn" onclick="logout()">Logout</button>
+    <div>
+      <button class="nav-btn" onclick="openAddPopup()">➕ Add Item</button>
+      <button class="nav-btn" onclick="logout()">Logout</button>
+    </div>
   </div>
 
   <!-- SEARCH -->

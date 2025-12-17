@@ -1,44 +1,9 @@
-// homepage.js
 let ALL_ITEMS = [];
-let LOGGED_EMAIL = localStorage.getItem("loggedInEmail");
 
-// ======================= ADD ITEM =======================
-document.getElementById('addItemForm')?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const form = document.getElementById('addItemForm');
-  const formData = new FormData(form);
-
-  const fileInput = document.getElementById('item_image');
-  if (fileInput?.files.length) {
-    formData.set('image', fileInput.files[0]);
-  }
-
-  try {
-    const res = await fetch('http://localhost:3000/add-found-item', {
-      method: 'POST',
-      body: formData
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      alert('Item uploaded successfully!');
-      form.reset();
-      loadItems();
-    } else {
-      alert('Upload failed: ' + data.message);
-    }
-  } catch (err) {
-    alert('Server error');
-    console.error(err);
-  }
-});
-
-// ======================= FETCH ITEMS =======================
+// ======================= LOAD ITEMS =======================
 async function loadItems() {
   try {
-    const res = await fetch('http://localhost:3000/found-items');
+    const res = await fetch("http://localhost:3000/found-items");
     const data = await res.json();
 
     if (data.success) {
@@ -50,7 +15,7 @@ async function loadItems() {
   }
 }
 
-// ======================= RENDER LIST =======================
+// ======================= RENDER LISTS =======================
 function renderLists() {
   const foundContainer = document.getElementById("itemsContainer");
   const returnedContainer = document.getElementById("returnedContainer");
@@ -65,7 +30,6 @@ function renderLists() {
   renderItemCards(returned, returnedContainer);
 }
 
-// ======================= RENDER CARDS =======================
 function renderItemCards(list, container) {
   if (!list.length) {
     container.innerHTML = "<p>No items</p>";
@@ -75,103 +39,121 @@ function renderItemCards(list, container) {
   list.forEach(item => {
     const div = document.createElement("div");
     div.className = "item-card";
-    div.style.cursor = "pointer";
 
     div.innerHTML = `
-      ${item.image_url ? `<img src="http://localhost:3000${item.image_url}" 
-        class="item-img">` : ""}
+      ${item.image_url ? `<img src="http://localhost:3000${item.image_url}" class="item-img">` : ""}
       <h3>${item.item_name}</h3>
       <p><strong>Location:</strong> ${item.location_found}</p>
-      ${item.description ? `<p><strong>Description:</strong> ${item.description}</p>` : ""}
       <p>${item.finder_email} • ${item.finder_phone}</p>
     `;
 
-    div.onclick = () => openPopup(item);
+    div.onclick = () => openViewPopup(item);
     container.appendChild(div);
   });
 }
 
-// ======================= POPUP =======================
-function openPopup(item) {
-  const popup = document.getElementById("itemPopup");
-  const box = document.getElementById("popupContent");
-
-  box.innerHTML = `
-    ${item.image_url ? `<img src="http://localhost:3000${item.image_url}" 
-      style="width:100%; border-radius:10px; margin-bottom:10px;">` : ""}
-
+// ======================= VIEW ITEM POPUP =======================
+function openViewPopup(item) {
+  document.getElementById("popupContent").innerHTML = `
     <h2>${item.item_name}</h2>
     <p><strong>Location:</strong> ${item.location_found}</p>
-    <p><strong>Description:</strong> ${item.description || 'None'}</p>
+    <p>${item.description || "No description provided"}</p>
 
     <h3>Finder Details</h3>
-    <p><strong>Email:</strong> ${item.finder_email}</p>
-    <p><strong>Phone:</strong> ${item.finder_phone}</p>
+    <p>${item.finder_email}</p>
+    <p>${item.finder_phone}</p>
 
-    <button onclick="startClaim('${item._id}', '${item.finder_email}', '${item.finder_phone}')"
-      style="margin-top:15px; padding:10px; background:#007bff; color:white; border:none; border-radius:8px; width:100%;">
+    <button style="background:#007bff;color:white"
+      onclick="startClaim('${item._id}','${item.finder_email}','${item.finder_phone}')">
       Claim Item
     </button>
 
-    <button onclick="closePopup()"
-      style="margin-top:10px; padding:10px; background:#ccc; border:none; border-radius:8px; width:100%;">
-      Close
-    </button>
+    <button onclick="closePopup()">Close</button>
   `;
 
-  popup.style.display = "flex";
+  document.getElementById("itemPopup").style.display = "flex";
 }
 
 function closePopup() {
   document.getElementById("itemPopup").style.display = "none";
 }
 
-// ======================= CLAIM =======================
-function startClaim(itemId, finderEmail, finderPhone) {
-  const box = document.getElementById("popupContent");
+// ======================= ADD ITEM POPUP =======================
+function openAddPopup() {
+  document.getElementById("popupContent").innerHTML = `
+    <h2>Add Found Item</h2>
 
-  box.innerHTML = `
-    <h2>Claim This Item</h2>
+    <input id="item_name" placeholder="Item Name *">
+    <input id="location_found" placeholder="Location Found *">
+    <textarea id="description" placeholder="Short Description (optional)"></textarea>
+    <input id="finder_email" placeholder="College Email (@bmsce.ac.in) *">
+    <input id="finder_phone" placeholder="Phone Number (10 digits) *">
+    <input id="item_image" type="file" accept="image/*">
 
-    <p><strong>Finder Email:</strong> ${finderEmail}</p>
-    <p><strong>Finder Phone:</strong> ${finderPhone}</p>
-
-    <input id="claim_email" placeholder="Your BMSCE Email">
-    <input id="claim_usn" placeholder="Your USN">
-    <input id="claim_phone" placeholder="Your Phone">
-
-    <button onclick="submitClaim('${itemId}')">Submit Claim</button>
+    <button style="background:#28a745;color:white" onclick="submitItem()">Submit</button>
     <button onclick="closePopup()">Cancel</button>
   `;
+
+  document.getElementById("itemPopup").style.display = "flex";
 }
 
-// ======================= SUBMIT CLAIM =======================
-async function submitClaim(itemId) {
-  const email = document.getElementById("claim_email").value;
-  const usn = document.getElementById("claim_usn").value;
-  const phone = document.getElementById("claim_phone").value;
+// ======================= SUBMIT ITEM (WITH VALIDATION) =======================
+async function submitItem() {
+  const name = document.getElementById("item_name").value.trim();
+  const location = document.getElementById("location_found").value.trim();
+  const email = document.getElementById("finder_email").value.trim();
+  const phone = document.getElementById("finder_phone").value.trim();
+  const image = document.getElementById("item_image").files[0];
+  const desc = document.getElementById("description").value;
 
-  const res = await fetch(`http://localhost:3000/claim-item/${itemId}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      claimant_email: email,
-      claimant_usn: usn,
-      claimant_phone: phone
-    })
-  });
+  // Mandatory check
+  if (!name || !location || !email || !phone || !image) {
+    alert("All fields except description are mandatory");
+    return;
+  }
 
-  const data = await res.json();
+  // Email validation
+  if (!email.endsWith("@bmsce.ac.in")) {
+    alert("Email must be a valid @bmsce.ac.in address");
+    return;
+  }
 
-  if (data.success) {
-    alert("Claim submitted successfully!");
-    closePopup();
-  } else {
-    alert(data.message);
+  // Phone validation (exactly 10 digits)
+  if (!/^[0-9]{10}$/.test(phone)) {
+    alert("Phone number must be exactly 10 digits");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("item_name", name);
+  formData.append("location_found", location);
+  formData.append("description", desc);
+  formData.append("finder_email", email);
+  formData.append("finder_phone", phone);
+  formData.append("image", image);
+
+  try {
+    const res = await fetch("http://localhost:3000/add-found-item", {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      alert("Item added successfully!");
+      closePopup();
+      loadItems();
+    } else {
+      alert(data.message);
+    }
+  } catch (err) {
+    alert("Server error");
+    console.error(err);
   }
 }
 
-// ======================= SEARCH (FIXED) =======================
+// ======================= SEARCH =======================
 document.getElementById("searchBar").addEventListener("input", function () {
   const query = this.value.toLowerCase().trim();
 
@@ -191,12 +173,9 @@ document.getElementById("searchBar").addEventListener("input", function () {
     item.location_found.toLowerCase().includes(query)
   );
 
-  const found = filtered.filter(i => !i.returned);
-  const returned = filtered.filter(i => i.returned);
-
-  renderItemCards(found, foundContainer);
-  renderItemCards(returned, returnedContainer);
+  renderItemCards(filtered.filter(i => !i.returned), foundContainer);
+  renderItemCards(filtered.filter(i => i.returned), returnedContainer);
 });
 
-// ======================= INITIAL LOAD =======================
+// ======================= INIT =======================
 window.addEventListener("DOMContentLoaded", loadItems);
