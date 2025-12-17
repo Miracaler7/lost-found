@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User / Admin</title>
+
+    <!-- Global Theme -->
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        .wrapper {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .logo {
+            width: 150px;
+            margin-bottom: 10px;
+        }
+
+        .title {
+            font-size: 28px;
+            margin-bottom: 25px;
+            font-weight: 700;
+            color: #1B1F3B;
+        }
+
+        .button-box {
+            background: white;
+            border-radius: 22px;
+            width: 380px;
+            padding: 35px 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            margin: auto;
+        }
+
+        .menu-btn {
+            width: 85%;
+            margin-top: 15px;
+            padding: 14px;
+            font-size: 17px;
+            border-radius: 14px;
+            font-weight: 600;
+        }
+
+        .menu-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0px 6px 15px rgba(60,120,255,0.2);
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div class="wrapper">
+        <img src="images/bms-removebg-preview.png" class="logo" alt="BMSCE Logo">
+        <div class="title">Lost & Found — BMSCE</div>
+
+        <div class="button-box">
+
+            <!-- USER BUTTON -->
+            <a href="LoginSignup.html">
+                <button class="btn btn-primary menu-btn">
+                    User Login / Signup
+                </button>
+            </a>
+
+            <!-- ADMIN BUTTON -->
+            <button onclick="openAdmin()" class="btn btn-outline menu-btn">
+                Admin Login
+            </button>
+
+        </div>
+    </div>
+
+
+    <script>
+        function openAdmin() {
+            window.location.href = "admin.html";
+        }
+    </script>
+
+</body>
+</html>

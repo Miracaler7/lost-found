@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BMSCE Lost & Found - Homepage</title>
+
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    .page-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: #1B1F3B;
+      margin-left: 25px;
+      margin-top: 25px;
+    }
+
+    #searchBar {
+      width: 320px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 2px solid #d3d9ee;
+      margin-left: 25px;
+      margin-top: 10px;
+      font-size: 15px;
+    }
+
+    .item-card {
+      width: 300px;
+      padding: 18px;
+    }
+
+    .item-img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 12px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <div class="navbar">
+    <div>Lost & Found — BMSCE</div>
+    <button class="nav-btn" onclick="logout()">Logout</button>
+  </div>
+
+  <!-- SEARCH -->
+  <h1 class="page-title">Found Items</h1>
+  <input id="searchBar" placeholder="Search by item or location...">
+
+  <!-- FOUND ITEMS -->
+  <div id="itemsContainer" class="grid"></div>
+
+  <!-- RETURNED ITEMS -->
+  <h1 class="page-title">Returned Items</h1>
+  <div id="returnedContainer" class="grid"></div>
+
+  <!-- POPUP -->
+  <div id="itemPopup" class="overlay">
+    <div id="popupContent" class="popup-box"></div>
+  </div>
+
+  <script src="homepage.js"></script>
+
+  <script>
+    function logout() {
+      localStorage.removeItem("loggedInEmail");
+      window.location.href = "UserAdmin.html";
+    }
+  </script>
+
+</body>
+</html>

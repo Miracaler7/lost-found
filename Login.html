@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login Page</title>
+
+  <!-- Global Theme -->
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    .logo {
+      width: 130px;
+      margin-bottom: 10px;
+    }
+
+    .login-box {
+      background: white;
+      width: 380px;
+      padding: 35px;
+      border-radius: 22px;
+      box-shadow: 0px 4px 18px rgba(0,0,0,0.12);
+      text-align: center;
+    }
+
+    .login-box h2 {
+      font-size: 24px;
+      margin-bottom: 15px;
+      color: #1B1F3B;
+      font-weight: 700;
+    }
+
+    .message {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 12px;
+      display: none;
+      font-weight: 500;
+    }
+
+    .success {
+      background-color: #D4FFE6;
+      color: #1B5E20;
+      display: block;
+    }
+
+    .error {
+      background-color: #FFE1E1;
+      color: #B71C1C;
+      display: block;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <img src="images/bms-removebg-preview.png" class="logo" alt="BMSCE LOGO">
+
+  <div class="login-box">
+
+    <h2>Login</h2>
+
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="@bmsce.ac.in Email" required><br>
+      <input type="password" id="password" placeholder="Password" required><br>
+
+      <button class="btn btn-primary" style="width: 100%; margin-top: 15px;">
+        Login
+      </button>
+    </form>
+
+    <div id="message" class="message"></div>
+
+  </div>
+
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const messageDiv = document.getElementById("message");
+
+      try {
+        const response = await fetch("http://localhost:3000/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          messageDiv.className = "message success";
+          messageDiv.textContent = "Login successful! Redirecting...";
+
+          setTimeout(() => {
+            localStorage.setItem("loggedInEmail", email);
+            window.location.href = "homepage.html";
+          }, 1500);
+
+        } else {
+          messageDiv.className = "message error";
+          messageDiv.textContent = data.message;
+        }
+
+      } catch (err) {
+        messageDiv.className = "message error";
+        messageDiv.textContent = "Server error";
+      }
+    });
+  </script>
+
+</body>
+</html>
