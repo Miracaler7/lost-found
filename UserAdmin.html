@@ -42,13 +42,13 @@
             font-size: 17px;
             border-radius: 14px;
             font-weight: 600;
+            cursor: pointer;
         }
 
         .menu-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0px 6px 15px rgba(60,120,255,0.2);
         }
-
     </style>
 </head>
 
@@ -68,17 +68,16 @@
             </a>
 
             <!-- ADMIN BUTTON -->
-            <button onclick="openAdmin()" class="btn btn-outline menu-btn">
+            <button onclick="openAdminLogin()" class="btn btn-outline menu-btn">
                 Admin Login
             </button>
 
         </div>
     </div>
 
-
     <script>
-        function openAdmin() {
-            window.location.href = "admin.html";
+        function openAdminLogin() {
+            window.location.href = "AdminLogin.html";
         }
     </script>
 

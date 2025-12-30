@@ -6,6 +6,22 @@
 
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="homepage.css">
+
+  <style>
+    #searchBar {
+      width: 320px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 2px solid #d3d9ee;
+      margin: 20px 25px;
+      font-size: 15px;
+    }
+
+    #searchBar:focus {
+      outline: none;
+      border-color: #4C84FF;
+    }
+  </style>
 </head>
 
 <body>
@@ -19,9 +35,20 @@
     </div>
   </div>
 
-  <h1 class="page-title">Found Items</h1>
+  <!-- SEARCH -->
+  <input
+    id="searchBar"
+    placeholder="Search by item name or location..."
+    oninput="handleSearch(this.value)"
+  >
 
+  <!-- FOUND ITEMS -->
+  <h1 class="page-title">Found Items</h1>
   <div id="itemsContainer" class="grid"></div>
+
+  <!-- RETURNED ITEMS -->
+  <h1 class="page-title">Returned Items</h1>
+  <div id="returnedContainer" class="grid"></div>
 
   <!-- POPUP -->
   <div id="itemPopup" class="overlay">

@@ -1,57 +1,196 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Admin Claims</title>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard</title>
   <link rel="stylesheet" href="styles.css">
+
+  <style>
+    .section { margin: 30px; }
+    .card {
+      background: white;
+      padding: 15px;
+      width: 260px;
+      border-radius: 16px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    }
+    .card img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 8px;
+    }
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 
 <body>
-  <div class="navbar">
-    <div>Admin Claims</div>
-    <button class="nav-btn" onclick="logout()">Logout</button>
-  </div>
 
-  <h2 class="section-title">Pending Claims</h2>
-  <div id="claims" class="grid"></div>
+<div class="navbar">
+  <div>Admin Dashboard</div>
+  <button class="nav-btn" onclick="logout()">Logout</button>
+</div>
 
-  <script>
-    async function loadClaims() {
-      const res = await fetch("http://localhost:3000/admin/pending-claims");
-      const claims = await res.json();
-      const c = document.getElementById("claims");
-      c.innerHTML = "";
+<div class="section">
+  <h2>Pending Found Items</h2>
+  <div id="pendingItems" class="grid"></div>
+</div>
 
-      claims.forEach(cl => {
-        c.innerHTML += `
-          <div class="item-card">
-            <h3>${cl.item_id.item_name}</h3>
-            <p>${cl.item_id.location_found}</p>
-            <p><b>Email:</b> ${cl.claimant_email}</p>
-            <p><b>Phone:</b> ${cl.claimant_phone}</p>
-            <p><b>USN:</b> ${cl.claimant_usn}</p>
+<div class="section">
+  <h2>Approved Found Items</h2>
+  <div id="approvedItems" class="grid"></div>
+</div>
 
-            <button onclick="approve('${cl._id}')">Approve</button>
-            <button onclick="reject('${cl._id}')">Reject</button>
-          </div>
-        `;
-      });
-    }
+<div class="section">
+  <h2>Pending Claims</h2>
+  <div id="pendingClaims" class="grid"></div>
+</div>
 
-    async function approve(id) {
-      await fetch(`http://localhost:3000/admin/approve-claim/${id}`, { method: "POST" });
-      loadClaims();
-    }
+<div class="section">
+  <h2>Returned Items</h2>
+  <div id="returnedItems" class="grid"></div>
+</div>
 
-    async function reject(id) {
-      await fetch(`http://localhost:3000/admin/reject-claim/${id}`, { method: "DELETE" });
-      loadClaims();
-    }
+<script>
+/* -------- AUTH CHECK -------- */
+if (!sessionStorage.getItem("admin")) {
+  window.location.href = "AdminLogin.html";
+}
 
-    function logout() {
-      window.location.href = "UserAdmin.html";
-    }
+/* -------- LOAD ALL -------- */
+function loadAll() {
+  loadPendingItems();
+  loadApprovedItems();
+  loadPendingClaims();
+  loadReturned();
+}
 
-    loadClaims();
-  </script>
+/* -------- PENDING FOUND ITEMS -------- */
+async function loadPendingItems() {
+  const r = await fetch("http://localhost:3000/admin/pending-items");
+  const items = await r.json();
+  const c = document.getElementById("pendingItems");
+  c.innerHTML = "";
+
+  if (!items.length) {
+    c.innerHTML = "<p>No pending found items</p>";
+    return;
+  }
+
+  items.forEach(i => {
+    c.innerHTML += `
+      <div class="card">
+        <img src="http://localhost:3000${i.image_url}">
+        <h4>${i.item_name}</h4>
+        <p>${i.location_found}</p>
+        <div class="btn-row">
+          <button class="btn btn-success" onclick="approveItem('${i._id}')">Approve</button>
+          <button class="btn btn-danger" onclick="deleteItem('${i._id}')">Reject</button>
+        </div>
+      </div>
+    `;
+  });
+}
+
+/* -------- APPROVED FOUND ITEMS -------- */
+async function loadApprovedItems() {
+  const r = await fetch("http://localhost:3000/found-items");
+  const data = await r.json();
+  const c = document.getElementById("approvedItems");
+  c.innerHTML = "";
+
+  data.items.forEach(i => {
+    c.innerHTML += `
+      <div class="card">
+        <img src="http://localhost:3000${i.image_url}">
+        <h4>${i.item_name}</h4>
+        <p>${i.location_found}</p>
+        <button class="btn btn-danger" onclick="deleteItem('${i._id}')">Delete</button>
+      </div>
+    `;
+  });
+}
+
+/* -------- PENDING CLAIMS (WITH IMAGE) -------- */
+async function loadPendingClaims() {
+  const r = await fetch("http://localhost:3000/admin/pending-claims");
+  const claims = await r.json();
+  const c = document.getElementById("pendingClaims");
+  c.innerHTML = "";
+
+  if (!claims.length) {
+    c.innerHTML = "<p>No pending claims</p>";
+    return;
+  }
+
+  claims.forEach(cl => {
+    c.innerHTML += `
+      <div class="card">
+        <img src="http://localhost:3000${cl.item_id.image_url}">
+        <h4>${cl.item_id.item_name}</h4>
+        <p>
+          ${cl.claimant_email}<br>
+          ${cl.claimant_phone}<br>
+          ${cl.claimant_usn}
+        </p>
+        <div class="btn-row">
+          <button class="btn btn-success" onclick="approveClaim('${cl._id}')">Approve</button>
+          <button class="btn btn-danger" onclick="rejectClaim('${cl._id}')">Reject</button>
+        </div>
+      </div>
+    `;
+  });
+}
+
+/* -------- RETURNED ITEMS (WITH IMAGE) -------- */
+async function loadReturned() {
+  const r = await fetch("http://localhost:3000/returned-items");
+  const data = await r.json();
+  const c = document.getElementById("returnedItems");
+  c.innerHTML = "";
+
+  data.returned.forEach(r => {
+    c.innerHTML += `
+      <div class="card">
+        <img src="http://localhost:3000${r.item.image_url}">
+        <h4>${r.item.item_name}</h4>
+        <p>
+          Claimed by:<br>
+          ${r.claimant_email}<br>
+          ${r.claimant_phone}<br>
+          ${r.claimant_usn}
+        </p>
+      </div>
+    `;
+  });
+}
+
+/* -------- ACTIONS -------- */
+function approveItem(id) {
+  fetch(`http://localhost:3000/admin/approve-item/${id}`, { method: "POST" }).then(loadAll);
+}
+function deleteItem(id) {
+  fetch(`http://localhost:3000/admin/delete-item/${id}`, { method: "DELETE" }).then(loadAll);
+}
+function approveClaim(id) {
+  fetch(`http://localhost:3000/admin/approve-claim/${id}`, { method: "POST" }).then(loadAll);
+}
+function rejectClaim(id) {
+  fetch(`http://localhost:3000/admin/reject-claim/${id}`, { method: "DELETE" }).then(loadAll);
+}
+
+function logout() {
+  sessionStorage.removeItem("admin");
+  window.location.href = "UserAdmin.html";
+}
+
+loadAll();
+</script>
+
 </body>
 </html>
