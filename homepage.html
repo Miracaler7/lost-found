@@ -2,59 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>BMSCE Lost & Found - Homepage</title>
+  <title>BMSCE Lost & Found</title>
 
   <link rel="stylesheet" href="styles.css">
-
-  <style>
-    .page-title {
-      font-size: 26px;
-      font-weight: 700;
-      margin-left: 25px;
-      margin-top: 25px;
-    }
-
-    #searchBar {
-      width: 320px;
-      padding: 12px;
-      border-radius: 12px;
-      border: 2px solid #d3d9ee;
-      margin-left: 25px;
-      margin-top: 10px;
-      font-size: 15px;
-    }
-
-    .item-card {
-      width: 300px;
-      padding: 18px;
-      cursor: pointer;
-    }
-
-    .item-img {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-      border-radius: 12px;
-    }
-
-    .popup-box input,
-    .popup-box textarea {
-      width: 100%;
-      padding: 10px;
-      margin: 6px 0;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-
-    .popup-box button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 8px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-  </style>
+  <link rel="stylesheet" href="homepage.css">
 </head>
 
 <body>
@@ -68,16 +19,9 @@
     </div>
   </div>
 
-  <!-- SEARCH -->
   <h1 class="page-title">Found Items</h1>
-  <input id="searchBar" placeholder="Search by item or location...">
 
-  <!-- FOUND ITEMS -->
   <div id="itemsContainer" class="grid"></div>
-
-  <!-- RETURNED ITEMS -->
-  <h1 class="page-title">Returned Items</h1>
-  <div id="returnedContainer" class="grid"></div>
 
   <!-- POPUP -->
   <div id="itemPopup" class="overlay">
@@ -85,13 +29,5 @@
   </div>
 
   <script src="homepage.js"></script>
-
-  <script>
-    function logout() {
-      localStorage.removeItem("loggedInEmail");
-      window.location.href = "UserAdmin.html";
-    }
-  </script>
-
 </body>
 </html>
