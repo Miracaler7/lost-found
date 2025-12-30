@@ -69,4 +69,11 @@ function closePopup() {
   document.getElementById("itemPopup").style.display = "none";
 }
 
+/* ---------------- LOGOUT ---------------- */
+
+function logout() {
+  localStorage.removeItem("loggedInEmail");
+  window.location.href = "UserAdmin.html";
+}
+
 window.onload = loadItems;
