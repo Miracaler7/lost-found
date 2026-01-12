@@ -2,55 +2,61 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>BMSCE Lost & Found</title>
+  <title>BMSCE LostNFound</title>
 
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="homepage.css">
 
   <style>
-    #searchBar {
-      width: 320px;
-      padding: 12px;
-      border-radius: 12px;
-      border: 2px solid #d3d9ee;
+    #filters {
+      display: flex;
+      gap: 16px;
       margin: 20px 25px;
-      font-size: 15px;
     }
 
-    #searchBar:focus {
-      outline: none;
-      border-color: #4C84FF;
+    select {
+      padding: 12px;
+      border-radius: 12px;
+      border: 2px solid #c9dff2;
+      font-size: 15px;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- NAVBAR -->
   <div class="navbar">
-    <div>Lost & Found — BMSCE</div>
+    <div>LostNFound — BMSCE</div>
     <div>
       <button class="nav-btn" onclick="openAddPopup()">➕ Add Item</button>
       <button class="nav-btn" onclick="logout()">Logout</button>
     </div>
   </div>
 
-  <!-- SEARCH -->
-  <input
-    id="searchBar"
-    placeholder="Search by item name or location..."
-    oninput="handleSearch(this.value)"
-  >
+  <!-- FILTERS -->
+  <div id="filters">
+    <input id="searchBar" placeholder="Search item or location" oninput="handleSearch(this.value)">
+    <select id="categoryFilter" onchange="filterByCategory(this.value)">
+      <option value="all">All Categories</option>
+      <option>Electronics</option>
+      <option>Documents</option>
+      <option>Wallets & Bags</option>
+      <option>Personal Accessories</option>
+      <option>Clothing</option>
+      <option>Books & Study Material</option>
+      <option>Money & Valuables</option>
+      <option>Daily Essentials</option>
+      <option>Sports Items</option>
+      <option>Miscellaneous</option>
+    </select>
+  </div>
 
-  <!-- FOUND ITEMS -->
   <h1 class="page-title">Found Items</h1>
   <div id="itemsContainer" class="grid"></div>
 
-  <!-- RETURNED ITEMS -->
   <h1 class="page-title">Returned Items</h1>
   <div id="returnedContainer" class="grid"></div>
 
-  <!-- POPUP -->
   <div id="itemPopup" class="overlay">
     <div id="popupContent" class="popup-box"></div>
   </div>

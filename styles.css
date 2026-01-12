@@ -1,168 +1,263 @@
-/* -------------------------------------------------------
-   🌤️ SOFT BLUE MODERN THEME (NO OVERGLOW)
--------------------------------------------------------- */
+/* =====================================================
+   FORMAL BLUE THEME — LOST & FOUND BMSCE
+   Clean • Professional • College Portal Style
+===================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+/* ---------------- ROOT COLORS ---------------- */
+
+:root {
+  --primary-blue: #1f3c88;
+  --accent-blue: #4c84ff;
+  --soft-blue: #e9f0ff;
+  --border-blue: #d6def5;
+
+  --success-green: #2eaf65;
+  --danger-red: #e05353;
+
+  --text-dark: #1b1f3b;
+  --text-muted: #555;
+  --white: #ffffff;
+}
+
+/* ---------------- BODY ---------------- */
 
 body {
   margin: 0;
   padding: 0;
   font-family: 'Poppins', sans-serif;
-  background: #e9f0ff;     /* soft pale blue */
+  background: var(--soft-blue);
+  color: var(--text-dark);
   min-height: 100vh;
-  color: #1B1F3B;
 }
 
-/* -------------------------------------------------------
-   NAVBAR
--------------------------------------------------------- */
+/* ---------------- NAVBAR ---------------- */
 
 .navbar {
-  background: #3C78FF;
+  background: var(--primary-blue);
   color: white;
-  padding: 16px 26px;
+  padding: 18px 28px;
   font-size: 20px;
   font-weight: 600;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
 }
+
+/* ---------------- NAV BUTTON ---------------- */
 
 .nav-btn {
   background: white;
-  color: #3C78FF;
-  padding: 8px 16px;
-  border-radius: 10px;
+  color: var(--primary-blue);
+  padding: 10px 18px;
+  border-radius: 12px;
   border: none;
   cursor: pointer;
-  transition: 0.2s;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.25s ease;
 }
 
 .nav-btn:hover {
   background: #f0f4ff;
+  transform: translateY(-2px);
 }
 
-/* -------------------------------------------------------
-   BUTTONS
--------------------------------------------------------- */
+/* ---------------- BUTTONS ---------------- */
 
 .btn {
-  padding: 14px 20px;
-  border-radius: 12px;
+  padding: 14px 22px;
+  border-radius: 14px;
   border: none;
   cursor: pointer;
   font-size: 16px;
   font-weight: 600;
-  transition: 0.2s ease;
+  transition: all 0.25s ease;
 }
 
 .btn-primary {
-  background: #4C84FF;
+  background: var(--accent-blue);
   color: white;
 }
 
 .btn-primary:hover {
-  background: #3b6fed;
+  background: #3a6fed;
+  transform: translateY(-2px);
 }
 
 .btn-outline {
   background: white;
-  color: #4C84FF;
-  border: 2px solid #4C84FF;
+  color: var(--accent-blue);
+  border: 2px solid var(--accent-blue);
 }
 
 .btn-outline:hover {
-  background: #4C84FF;
+  background: var(--accent-blue);
   color: white;
-}
-
-.btn-danger {
-  background: #ff5b5b;
-  color: white;
-}
-
-.btn-danger:hover {
-  background: #e44a4a;
 }
 
 .btn-success {
-  background: #35c66a;
+  background: var(--success-green);
   color: white;
 }
 
 .btn-success:hover {
-  background: #2bab58;
+  background: #249757;
 }
 
-/* -------------------------------------------------------
-   GLOBAL CARD STYLE
--------------------------------------------------------- */
+.btn-danger {
+  background: var(--danger-red);
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #c94545;
+}
+
+/* ---------------- CARDS ---------------- */
 
 .card,
 .item-card,
 .login-card,
-.menu-card {
-  background: white;
-  border-radius: 20px;
+.signup-box,
+.menu-card,
+.button-box {
+  background: var(--white);
+  border-radius: 22px;
   padding: 22px;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
-  transition: 0.2s ease;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  transition: all 0.25s ease;
 }
 
 .card:hover,
 .item-card:hover,
 .menu-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
 }
 
-/* -------------------------------------------------------
-   GRID LAYOUT
--------------------------------------------------------- */
+/* ---------------- GRID ---------------- */
 
 .grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 22px;
-  padding: 25px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 24px;
+  padding: 26px;
 }
 
-/* -------------------------------------------------------
-   INPUTS
--------------------------------------------------------- */
+/* ---------------- ITEM IMAGE ---------------- */
+
+.item-img,
+.card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 14px;
+  margin-bottom: 8px;
+}
+
+/* ---------------- HEADINGS ---------------- */
+
+h1,
+h2,
+h3,
+h4 {
+  color: var(--primary-blue);
+}
+
+/* ---------------- INPUTS ---------------- */
 
 input,
 textarea {
-  width: 90%;
-  padding: 12px;
+  width: 100%;
+  padding: 12px 14px;
   border-radius: 12px;
-  border: 1.8px solid #d3d9ee;
+  border: 1.8px solid var(--border-blue);
   font-size: 15px;
   margin-top: 10px;
-  transition: 0.2s;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
 }
 
 input:focus,
 textarea:focus {
-  border-color: #4C84FF;
+  border-color: var(--accent-blue);
   outline: none;
 }
 
-/* -------------------------------------------------------
-   POPUP / MODAL
--------------------------------------------------------- */
+/* ---------------- POPUP OVERLAY ---------------- */
 
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.35);
+  background: linear-gradient(
+    rgba(31, 60, 136, 0.45),
+    rgba(31, 60, 136, 0.45)
+  );
+  backdrop-filter: blur(5px);
   display: none;
   justify-content: center;
   align-items: center;
+  z-index: 10;
 }
+
+/* ---------------- POPUP BOX ---------------- */
 
 .popup-box {
   background: white;
-  width: 360px;
-  padding: 25px;
-  border-radius: 18px;
-  box-shadow: 0px 6px 22px rgba(0,0,0,0.3);
+  width: 380px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 30px;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+/* Popup title */
+.popup-box h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+/* Spacing between fields */
+.popup-box input,
+.popup-box textarea {
+  margin-bottom: 12px;
+}
+
+/* Textarea refinement */
+.popup-box textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+/* File input */
+.popup-box input[type="file"] {
+  padding: 6px;
+}
+
+/* Popup buttons spacing */
+.popup-box .btn {
+  margin-top: 12px;
+}
+
+/* ---------------- STATUS MESSAGES ---------------- */
+
+.success {
+  background: #d8f5e5;
+  color: #1b5e20;
+}
+
+.error {
+  background: #ffe1e1;
+  color: #b71c1c;
+}
+
+/* ---------------- LINKS ---------------- */
+
+a {
+  text-decoration: none;
 }

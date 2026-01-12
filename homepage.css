@@ -1,43 +1,64 @@
-/* ---------------- PAGE LAYOUT ---------------- */
+/* =================================================
+   HOMEPAGE — BLUE THEME + FIXED POPUP IMAGE
+================================================= */
+
+/* Force visible blue background */
+html,
+body {
+  background: #e3ecff !important;
+}
+
+/* ================= PAGE TITLES ================= */
 
 .page-title {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 700;
-  margin: 25px;
+  margin: 30px 25px 10px;
+  color: #1f3c88;
 }
+
+/* ================= GRID ================= */
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 20px;
-  padding: 25px;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 24px;
+  padding: 26px;
 }
 
-/* ---------------- ITEM CARD ---------------- */
+/* ================= ITEM CARD ================= */
 
 .item-card {
   background: white;
-  border-radius: 16px;
-  padding: 12px;
+  border-radius: 22px;
+  padding: 16px;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-  transition: 0.2s;
+  box-shadow: 0 8px 22px rgba(31, 60, 136, 0.18);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .item-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(31, 60, 136, 0.28);
 }
+
+/* ================= ITEM IMAGE (CARD) ================= */
 
 .item-img {
   width: 100%;
-  height: 130px;
+  height: 150px;
   object-fit: cover;
-  border-radius: 12px;
+  border-radius: 14px;
+  margin-bottom: 10px;
+  background: #d6e2ff;
 }
+
+/* ================= ITEM TEXT ================= */
 
 .item-card h3 {
   font-size: 16px;
   margin: 6px 0 2px;
+  color: #1f3c88;
 }
 
 .item-card p {
@@ -46,50 +67,69 @@
   margin: 0;
 }
 
-/* ---------------- POPUP ---------------- */
+/* ================= POPUP OVERLAY ================= */
 
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.35);
+  background: rgba(31, 60, 136, 0.45);
+  backdrop-filter: blur(6px);
   display: none;
   justify-content: center;
   align-items: center;
 }
+
+/* ================= POPUP BOX ================= */
 
 .popup-box {
   background: white;
   width: 380px;
   max-height: 85vh;
   overflow-y: auto;
-  padding: 20px;
-  border-radius: 18px;
-  box-shadow: 0 6px 22px rgba(0,0,0,0.3);
+  padding: 26px;
+  border-radius: 24px;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35);
 }
 
+/* ================= 🔥 POPUP IMAGE FIX ================= */
+
+/* This targets ONLY the image inside popup */
 .popup-box img {
   width: 100%;
-  height: 160px;
-  object-fit: cover;
-  border-radius: 12px;
-  margin-bottom: 10px;
+  max-height: 260px;          /* 🔹 limit image height */
+  object-fit: contain;        /* 🔹 show full image */
+  border-radius: 14px;
+  margin: 12px 0;
+  background: #f1f4ff;        /* clean background behind image */
+  padding: 6px;
 }
+
+/* ================= POPUP TEXT ================= */
+
+.popup-box h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  text-align: center;
+  color: #1f3c88;
+}
+
+.popup-box p {
+  font-size: 14px;
+  color: #333;
+}
+
+/* ================= INPUTS IN POPUP ================= */
 
 .popup-box input {
   width: 100%;
-  padding: 10px;
-  margin-top: 8px;
-  border-radius: 8px;
-  border: 1.5px solid #ccc;
-  font-size: 14px;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 12px;
+  border: 1.5px solid #d6def5;
 }
 
-.popup-box button {
-  width: 100%;
-  margin-top: 10px;
-  padding: 10px;
-  border-radius: 10px;
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
+/* ================= BUTTON SPACING ================= */
+
+.popup-box .btn {
+  margin-top: 12px;
 }

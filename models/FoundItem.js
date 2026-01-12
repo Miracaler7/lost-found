@@ -2,8 +2,9 @@ const mongoose = require("mongoose");
 
 const foundItemSchema = new mongoose.Schema({
   item_name: { type: String, required: true },
+  category: { type: String, required: true },   // ✅ NEW
   location_found: { type: String, required: true },
-  date_found: { type: String, required: true },   // ✅ NEW
+  date_found: { type: String, required: true },
   description: { type: String },
   finder_email: { type: String, required: true },
   finder_phone: { type: String, required: true },

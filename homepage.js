@@ -4,7 +4,7 @@ let RETURNED_ITEMS = [];
 let FILTERED_FOUND = [];
 let FILTERED_RETURNED = [];
 
-/* ---------------- LOAD ---------------- */
+/* ================= LOAD ================= */
 
 async function loadAll() {
   await loadFound();
@@ -14,7 +14,14 @@ async function loadAll() {
 async function loadFound() {
   const res = await fetch("http://localhost:3000/found-items");
   const data = await res.json();
-  FOUND_ITEMS = data.items || [];
+
+  FOUND_ITEMS = (data.items || []).map(item => ({
+    ...item,
+    category: item.category && item.category.trim()
+      ? item.category
+      : "Miscellaneous"
+  }));
+
   FILTERED_FOUND = [...FOUND_ITEMS];
   renderFound();
 }
@@ -22,92 +29,123 @@ async function loadFound() {
 async function loadReturned() {
   const res = await fetch("http://localhost:3000/returned-items");
   const data = await res.json();
-  RETURNED_ITEMS = data.returned || [];
+
+  RETURNED_ITEMS = (data.returned || []).map(r => ({
+    ...r,
+    item: {
+      ...r.item,
+      category: r.item.category && r.item.category.trim()
+        ? r.item.category
+        : "Miscellaneous"
+    }
+  }));
+
   FILTERED_RETURNED = [...RETURNED_ITEMS];
   renderReturned();
 }
 
-/* ---------------- SEARCH ---------------- */
+/* ================= SEARCH ================= */
 
 function handleSearch(query) {
   const q = query.toLowerCase().trim();
 
-  if (!q) {
-    FILTERED_FOUND = [...FOUND_ITEMS];
-    FILTERED_RETURNED = [...RETURNED_ITEMS];
-  } else {
-    FILTERED_FOUND = FOUND_ITEMS.filter(i =>
-      i.item_name.toLowerCase().includes(q) ||
-      i.location_found.toLowerCase().includes(q)
-    );
-
-    FILTERED_RETURNED = RETURNED_ITEMS.filter(r =>
-      r.item.item_name.toLowerCase().includes(q) ||
-      r.item.location_found.toLowerCase().includes(q)
-    );
-  }
+  FILTERED_FOUND = FOUND_ITEMS.filter(i =>
+    i.item_name.toLowerCase().includes(q) ||
+    i.location_found.toLowerCase().includes(q)
+  );
 
   renderFound();
-  renderReturned();
 }
 
-/* ---------------- FOUND ---------------- */
+/* ================= CATEGORY FILTER ================= */
+
+function filterByCategory(category) {
+  if (category === "all") {
+    FILTERED_FOUND = [...FOUND_ITEMS];
+  } else {
+    FILTERED_FOUND = FOUND_ITEMS.filter(i => i.category === category);
+  }
+  renderFound();
+}
+
+/* ================= RENDER FOUND ================= */
 
 function renderFound() {
   const c = document.getElementById("itemsContainer");
   c.innerHTML = "";
 
   if (!FILTERED_FOUND.length) {
-    c.innerHTML = "<p style='margin:25px'>No matching found items</p>";
+    c.innerHTML = "<p style='margin:20px'>No items found</p>";
     return;
   }
 
   FILTERED_FOUND.forEach(item => {
     c.innerHTML += `
       <div class="item-card" onclick="openClaim('${item._id}')">
-        <img src="http://localhost:3000${item.image_url}" class="item-img">
+        <img
+          src="http://localhost:3000${item.image_url}"
+          class="item-img"
+          onerror="this.onerror=null;this.src='images/placeholder.png'"
+        >
         <h3>${item.item_name}</h3>
+        <p>${item.category}</p>
         <p>${item.location_found}</p>
       </div>
     `;
   });
 }
 
-/* ---------------- RETURNED ---------------- */
+/* ================= RENDER RETURNED ================= */
 
 function renderReturned() {
   const c = document.getElementById("returnedContainer");
   c.innerHTML = "";
 
   if (!FILTERED_RETURNED.length) {
-    c.innerHTML = "<p style='margin:25px'>No matching returned items</p>";
+    c.innerHTML = "<p style='margin:20px'>No returned items</p>";
     return;
   }
 
   FILTERED_RETURNED.forEach(r => {
     const i = r.item;
+
     c.innerHTML += `
       <div class="item-card">
-        <img src="http://localhost:3000${i.image_url}" class="item-img">
+        <img
+          src="http://localhost:3000${i.image_url}"
+          class="item-img"
+          onerror="this.onerror=null;this.src='images/placeholder.png'"
+        >
         <h3>${i.item_name}</h3>
+        <p>${i.category}</p>
         <p>${i.location_found}</p>
-        <p><b>Date Found:</b> ${i.date_found}</p>
         <p><b>Claimed By</b></p>
-        <p>Email: ${r.claimant_email}</p>
-        <p>Phone: ${r.claimant_phone}</p>
-        <p>USN: ${r.claimant_usn}</p>
+        <p>${r.claimant_email}</p>
       </div>
     `;
   });
 }
 
-/* ---------------- ADD ITEM POPUP ---------------- */
+/* ================= ADD ITEM ================= */
 
 function openAddPopup() {
   document.getElementById("popupContent").innerHTML = `
     <h3>Add Found Item</h3>
 
     <input id="item_name" placeholder="Item Name">
+    <select id="category">
+      <option>Electronics</option>
+      <option>Documents</option>
+      <option>Wallets & Bags</option>
+      <option>Personal Accessories</option>
+      <option>Clothing</option>
+      <option>Books & Study Material</option>
+      <option>Money & Valuables</option>
+      <option>Daily Essentials</option>
+      <option>Sports Items</option>
+      <option>Miscellaneous</option>
+    </select>
+
     <input id="location_found" placeholder="Location Found">
     <input id="date_found" type="date">
     <textarea id="description" placeholder="Description"></textarea>
@@ -125,8 +163,9 @@ function openAddPopup() {
 async function submitItem() {
   const fd = new FormData();
   fd.append("item_name", item_name.value);
+  fd.append("category", category.value);
   fd.append("location_found", location_found.value);
-  fd.append("date_found", date_found.value);   // ✅ NEW
+  fd.append("date_found", date_found.value);
   fd.append("description", description.value);
   fd.append("finder_email", finder_email.value);
   fd.append("finder_phone", finder_phone.value);
@@ -142,12 +181,13 @@ async function submitItem() {
   if (data.success) {
     alert("Item sent to admin for approval");
     closePopup();
+    loadFound();
   } else {
     alert("Error submitting item");
   }
 }
 
-/* ---------------- CLAIM POPUP ---------------- */
+/* ================= CLAIM ================= */
 
 function openClaim(id) {
   const item = FOUND_ITEMS.find(i => i._id === id);
@@ -155,6 +195,7 @@ function openClaim(id) {
   document.getElementById("popupContent").innerHTML = `
     <h3>${item.item_name}</h3>
     <img src="http://localhost:3000${item.image_url}">
+    <p><b>Category:</b> ${item.category}</p>
     <p><b>Location:</b> ${item.location_found}</p>
     <p><b>Date Found:</b> ${item.date_found}</p>
     <p>${item.description || "No description"}</p>
@@ -163,7 +204,9 @@ function openClaim(id) {
     <input id="cp" placeholder="Phone Number">
     <input id="cu" placeholder="USN">
 
-    <button class="btn btn-success" onclick="submitClaim('${item._id}')">Submit Claim</button>
+    <button class="btn btn-success" onclick="submitClaim('${item._id}')">
+      Submit Claim
+    </button>
     <button class="btn btn-outline" onclick="closePopup()">Cancel</button>
   `;
 
@@ -186,7 +229,7 @@ async function submitClaim(id) {
   closePopup();
 }
 
-/* ---------------- UTILS ---------------- */
+/* ================= UTILS ================= */
 
 function closePopup() {
   document.getElementById("itemPopup").style.display = "none";
