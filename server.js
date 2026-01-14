@@ -40,8 +40,7 @@ mongoose
   .connect(
     "mongodb+srv://rushil200581_db_user:mrBbmixmy64MOEPX@cluster0.dyyzu9h.mongodb.net/lostfoundDB"
   )
-  .then(() => console.log("MongoDB connected"))
-  .catch(err => console.error(err));
+  .then(() => console.log("MongoDB connected"));
 
 /* ---------------- USER AUTH ---------------- */
 
