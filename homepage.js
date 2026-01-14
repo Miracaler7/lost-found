@@ -14,14 +14,7 @@ async function loadAll() {
 async function loadFound() {
   const res = await fetch("http://localhost:3000/found-items");
   const data = await res.json();
-
-  FOUND_ITEMS = (data.items || []).map(item => ({
-    ...item,
-    category: item.category && item.category.trim()
-      ? item.category
-      : "Miscellaneous"
-  }));
-
+  FOUND_ITEMS = data.items || [];
   FILTERED_FOUND = [...FOUND_ITEMS];
   renderFound();
 }
@@ -29,17 +22,7 @@ async function loadFound() {
 async function loadReturned() {
   const res = await fetch("http://localhost:3000/returned-items");
   const data = await res.json();
-
-  RETURNED_ITEMS = (data.returned || []).map(r => ({
-    ...r,
-    item: {
-      ...r.item,
-      category: r.item.category && r.item.category.trim()
-        ? r.item.category
-        : "Miscellaneous"
-    }
-  }));
-
+  RETURNED_ITEMS = data.returned || [];
   FILTERED_RETURNED = [...RETURNED_ITEMS];
   renderReturned();
 }
@@ -63,7 +46,9 @@ function filterByCategory(category) {
   if (category === "all") {
     FILTERED_FOUND = [...FOUND_ITEMS];
   } else {
-    FILTERED_FOUND = FOUND_ITEMS.filter(i => i.category === category);
+    FILTERED_FOUND = FOUND_ITEMS.filter(i =>
+      (i.category || "Miscellaneous") === category
+    );
   }
   renderFound();
 }
@@ -80,6 +65,8 @@ function renderFound() {
   }
 
   FILTERED_FOUND.forEach(item => {
+    const category = item.category || "Miscellaneous";
+
     c.innerHTML += `
       <div class="item-card" onclick="openClaim('${item._id}')">
         <img
@@ -88,8 +75,9 @@ function renderFound() {
           onerror="this.onerror=null;this.src='images/placeholder.png'"
         >
         <h3>${item.item_name}</h3>
-        <p>${item.category}</p>
+        <p>${category}</p>
         <p>${item.location_found}</p>
+        <p><b>Contact:</b> ${item.finder_phone}</p>
       </div>
     `;
   });
@@ -108,6 +96,7 @@ function renderReturned() {
 
   FILTERED_RETURNED.forEach(r => {
     const i = r.item;
+    const category = i.category || "Miscellaneous";
 
     c.innerHTML += `
       <div class="item-card">
@@ -117,10 +106,11 @@ function renderReturned() {
           onerror="this.onerror=null;this.src='images/placeholder.png'"
         >
         <h3>${i.item_name}</h3>
-        <p>${i.category}</p>
+        <p>${category}</p>
         <p>${i.location_found}</p>
         <p><b>Claimed By</b></p>
         <p>${r.claimant_email}</p>
+        <p>${r.claimant_phone}</p>
       </div>
     `;
   });
@@ -191,13 +181,18 @@ async function submitItem() {
 
 function openClaim(id) {
   const item = FOUND_ITEMS.find(i => i._id === id);
+  const category = item.category || "Miscellaneous";
 
   document.getElementById("popupContent").innerHTML = `
     <h3>${item.item_name}</h3>
-    <img src="http://localhost:3000${item.image_url}">
-    <p><b>Category:</b> ${item.category}</p>
+    <img
+      src="http://localhost:3000${item.image_url}"
+      onerror="this.onerror=null;this.src='images/placeholder.png'"
+    >
+    <p><b>Category:</b> ${category}</p>
     <p><b>Location:</b> ${item.location_found}</p>
     <p><b>Date Found:</b> ${item.date_found}</p>
+    <p><b>Finder Contact:</b> ${item.finder_phone}</p>
     <p>${item.description || "No description"}</p>
 
     <input id="ce" placeholder="College Email">
