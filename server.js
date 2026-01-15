@@ -23,7 +23,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const uploadsDir = path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
-
 app.use("/uploads", express.static(uploadsDir));
 
 const storage = multer.diskStorage({
@@ -31,45 +30,31 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) =>
     cb(null, Date.now() + "-" + file.originalname.replace(/\s+/g, "_"))
 });
-
 const upload = multer({ storage });
 
 /* ---------------- MONGODB ---------------- */
 
-mongoose
-  .connect(
-    "mongodb+srv://rushil200581_db_user:mrBbmixmy64MOEPX@cluster0.dyyzu9h.mongodb.net/lostfoundDB"
-  )
-  .then(() => console.log("MongoDB connected"))
-  .catch(err => console.error(err));
+mongoose.connect(
+  "mongodb+srv://rushil200581_db_user:mrBbmixmy64MOEPX@cluster0.dyyzu9h.mongodb.net/lostfoundDB"
+).then(() => console.log("MongoDB connected"));
 
 /* ---------------- USER AUTH ---------------- */
 
 app.post("/signup", async (req, res) => {
   const { name, phone, email, usn, password } = req.body;
-
   const hashed = await bcrypt.hash(password, 10);
-
-  await User.create({
-    name,
-    phone,
-    email,
-    usn,
-    password: hashed
-  });
-
+  await User.create({ name, phone, email, usn, password: hashed });
   res.json({ success: true });
 });
 
 app.post("/login", async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
   if (!user) return res.json({ success: false });
-
   const ok = await bcrypt.compare(req.body.password, user.password);
   res.json({ success: ok });
 });
 
-/* ---------------- ADD FOUND ITEM (FIXED) ---------------- */
+/* ---------------- ADD FOUND ITEM ---------------- */
 
 app.post("/add-found-item", upload.single("image"), async (req, res) => {
   const category =
@@ -79,7 +64,7 @@ app.post("/add-found-item", upload.single("image"), async (req, res) => {
 
   await FoundItem.create({
     item_name: req.body.item_name,
-    category: category,                 // ✅ FIX
+    category,
     location_found: req.body.location_found,
     date_found: req.body.date_found,
     description: req.body.description,
@@ -100,13 +85,42 @@ app.get("/found-items", async (req, res) => {
     approved: true,
     returned: false
   });
-
   res.json({ success: true, items });
 });
+
+/* ---------------- 🚫 PREVENT DUPLICATE CLAIMS ---------------- */
 
 app.post("/claim-item", async (req, res) => {
   const { item_id, claimant_email, claimant_phone, claimant_usn } = req.body;
 
+  // 1️⃣ Check if item exists
+  const item = await FoundItem.findById(item_id);
+  if (!item) {
+    return res.json({ success: false, message: "Item not found" });
+  }
+
+  // 2️⃣ Prevent claim if already returned
+  if (item.returned) {
+    return res.json({
+      success: false,
+      message: "Item has already been returned"
+    });
+  }
+
+  // 3️⃣ Prevent duplicate claims (pending OR approved)
+  const existingClaim = await Claim.findOne({
+    item_id,
+    status: { $in: ["pending", "approved"] }
+  });
+
+  if (existingClaim) {
+    return res.json({
+      success: false,
+      message: "A claim already exists for this item"
+    });
+  }
+
+  // ✅ Create claim
   await Claim.create({
     item_id,
     claimant_email,
@@ -117,24 +131,34 @@ app.post("/claim-item", async (req, res) => {
   res.json({ success: true });
 });
 
-app.get("/returned-items", async (req, res) => {
-  const claims = await Claim.find({ status: "approved" }).populate("item_id");
+/* ---------------- RETURNED ITEMS ---------------- */
 
-  const returned = claims.map(c => ({
-    item: c.item_id,
-    claimant_email: c.claimant_email,
-    claimant_phone: c.claimant_phone,
-    claimant_usn: c.claimant_usn
-  }));
+app.get("/returned-items", async (req, res) => {
+  const items = await FoundItem.find({ returned: true });
+
+  const returned = await Promise.all(
+    items.map(async item => {
+      const claim = await Claim.findOne({
+        item_id: item._id,
+        status: "approved"
+      });
+
+      return {
+        item,
+        claimant_email: claim?.claimant_email || "N/A",
+        claimant_phone: claim?.claimant_phone || "N/A",
+        claimant_usn: claim?.claimant_usn || "N/A"
+      };
+    })
+  );
 
   res.json({ success: true, returned });
 });
 
-/* ---------------- ADMIN ROUTES ---------------- */
+/* ---------------- ADMIN ---------------- */
 
 app.get("/admin/pending-items", async (req, res) => {
-  const items = await FoundItem.find({ approved: false });
-  res.json(items);
+  res.json(await FoundItem.find({ approved: false }));
 });
 
 app.post("/admin/approve-item/:id", async (req, res) => {
@@ -144,12 +168,12 @@ app.post("/admin/approve-item/:id", async (req, res) => {
 
 app.delete("/admin/delete-item/:id", async (req, res) => {
   await FoundItem.findByIdAndDelete(req.params.id);
+  await Claim.deleteMany({ item_id: req.params.id });
   res.json({ success: true });
 });
 
 app.get("/admin/pending-claims", async (req, res) => {
-  const claims = await Claim.find({ status: "pending" }).populate("item_id");
-  res.json(claims);
+  res.json(await Claim.find({ status: "pending" }).populate("item_id"));
 });
 
 app.post("/admin/approve-claim/:id", async (req, res) => {
@@ -160,6 +184,7 @@ app.post("/admin/approve-claim/:id", async (req, res) => {
   );
 
   await FoundItem.findByIdAndUpdate(claim.item_id, {
+    approved: true,
     returned: true
   });
 
@@ -171,7 +196,7 @@ app.delete("/admin/reject-claim/:id", async (req, res) => {
   res.json({ success: true });
 });
 
-/* ---------------- START SERVER ---------------- */
+/* ---------------- START ---------------- */
 
 app.listen(3000, () => {
   console.log("Server running on http://localhost:3000");

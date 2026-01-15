@@ -209,7 +209,7 @@ function openClaim(id) {
 }
 
 async function submitClaim(id) {
-  await fetch("http://localhost:3000/claim-item", {
+  const res = await fetch("http://localhost:3000/claim-item", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -220,9 +220,16 @@ async function submitClaim(id) {
     })
   });
 
-  alert("Claim sent to admin");
-  closePopup();
+  const data = await res.json();
+
+  if (data.success) {
+    alert("Claim sent to admin");
+    closePopup();
+  } else {
+    alert(data.message || "Unable to submit claim");
+  }
 }
+
 
 /* ================= UTILS ================= */
 
