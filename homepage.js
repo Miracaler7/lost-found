@@ -64,8 +64,16 @@ function renderFound() {
     return;
   }
 
+  const loggedInEmail =
+    localStorage.getItem("loggedInEmail")?.trim().toLowerCase();
+
   FILTERED_FOUND.forEach(item => {
     const category = item.category || "Miscellaneous";
+
+    const isOwner =
+      item.finder_email &&
+      loggedInEmail &&
+      item.finder_email.trim().toLowerCase() === loggedInEmail;
 
     c.innerHTML += `
       <div class="item-card" onclick="openClaim('${item._id}')">
@@ -78,9 +86,40 @@ function renderFound() {
         <p>${category}</p>
         <p>${item.location_found}</p>
         <p><b>Contact:</b> ${item.finder_phone}</p>
+
+        ${
+          isOwner
+            ? `<button
+                class="btn btn-success"
+                style="margin-top:10px"
+                onclick="event.stopPropagation(); markReturned('${item._id}')">
+                Returned
+              </button>`
+            : ""
+        }
       </div>
     `;
   });
+}
+
+/* ================= MARK RETURNED ================= */
+
+async function markReturned(id) {
+  if (!confirm("Mark this item as returned?")) return;
+
+  const res = await fetch(
+    `http://localhost:3000/user/mark-returned/${id}`,
+    { method: "POST" }
+  );
+
+  const data = await res.json();
+
+  if (data.success) {
+    alert("Item marked as returned");
+    loadAll();
+  } else {
+    alert("Unable to mark item as returned");
+  }
 }
 
 /* ================= RENDER RETURNED ================= */
@@ -229,7 +268,6 @@ async function submitClaim(id) {
     alert(data.message || "Unable to submit claim");
   }
 }
-
 
 /* ================= UTILS ================= */
 

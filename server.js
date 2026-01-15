@@ -88,18 +88,30 @@ app.get("/found-items", async (req, res) => {
   res.json({ success: true, items });
 });
 
+/* ✅ USER MARK ITEM AS RETURNED (NEW – SAFE) */
+
+app.post("/user/mark-returned/:id", async (req, res) => {
+  const item = await FoundItem.findById(req.params.id);
+  if (!item) {
+    return res.json({ success: false, message: "Item not found" });
+  }
+
+  item.returned = true;
+  await item.save();
+
+  res.json({ success: true });
+});
+
 /* ---------------- 🚫 PREVENT DUPLICATE CLAIMS ---------------- */
 
 app.post("/claim-item", async (req, res) => {
   const { item_id, claimant_email, claimant_phone, claimant_usn } = req.body;
 
-  // 1️⃣ Check if item exists
   const item = await FoundItem.findById(item_id);
   if (!item) {
     return res.json({ success: false, message: "Item not found" });
   }
 
-  // 2️⃣ Prevent claim if already returned
   if (item.returned) {
     return res.json({
       success: false,
@@ -107,7 +119,6 @@ app.post("/claim-item", async (req, res) => {
     });
   }
 
-  // 3️⃣ Prevent duplicate claims (pending OR approved)
   const existingClaim = await Claim.findOne({
     item_id,
     status: { $in: ["pending", "approved"] }
@@ -120,7 +131,6 @@ app.post("/claim-item", async (req, res) => {
     });
   }
 
-  // ✅ Create claim
   await Claim.create({
     item_id,
     claimant_email,
